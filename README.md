@@ -4,8 +4,8 @@
 
 ## 准备环境
 
-* 安装 python 3.6 或以上版本 
-    https://www.python.org/downloads/
+* 安装 [python](https://www.python.org/downloads/) 3.6 或以上版本 
+    
 
 * 安装 [Pillow](https://python-pillow.org/)
     ```
