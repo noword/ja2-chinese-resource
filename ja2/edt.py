@@ -26,14 +26,38 @@ class Edt(Base, list):
     def encode(self, s: str, size):
         for k, v in ENCODE_TAB.items():
             s = s.replace(k, v)
-        bs = [ord(x) for x in s]
-        bs = [x + 1 if x > 32 else x for x in bs]
+        bs = []
+        for c in s:
+            c = ord(c)
+            if 0x410 <= c <= 0x415:
+                c += 0x3d
+            elif c == 0x401:
+                c = 0x453
+            elif 0x417 <= c <= 0x42a:
+                c += 0x3e
+            elif 0x42b <= c <= 0x42f:
+                c += 0x3d
+            if c > 32:
+                c += 1
+            bs.append(c)
         return pack(f'{len(bs)}H', *bs) + b'\x00\x00' * (size - len(bs))
 
     def decode(self, bs: bytes):
-        bs = unpack(f'{len(bs)//2}H', bs)
-        bs = [chr(x - 1) if x > 33 else chr(x) for x in bs]
-        s = ''.join(bs).split('\x00')[0]
+        s = []
+        for c in unpack(f'{len(bs)//2}H', bs):
+            if c > 33:
+                c -= 1
+            if 0x44d <= c <= 0x452:
+                c -= 0x3d
+            elif c == 0x453:
+                c = 0x401
+            elif 0x454 <= c <= 0x467:
+                c -= 0x3e
+            elif 0x468 <= c <= 0x46c:
+                c -= 0x3d
+            s.append(chr(c))
+
+        s = ''.join(s).split('\x00')[0]
         for k, v in DECODE_TAB.items():
             s = s.replace(k, v)
         return s
