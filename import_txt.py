@@ -18,7 +18,9 @@ def load_text(name, encoding='utf-8'):
 OUT_PATH = 'out/Data'
 if __name__ == '__main__':
     tanslation = Translation('ja2.xlsx')
-    for t in tanslation.check_variables(r'\[[A-Z]+?\]', 'English', 'Chinese'):
+    for t in tanslation.check_variables(r'\[[A-Z]+?\](?=\s|$)', 'English', 'Chinese'):
+        print(t)
+    for t in tanslation.check_variables(r'\$[A-Z]+?\$', 'English', 'Chinese'):
         print(t)
 
     trans = tanslation.get_translation(index='English')

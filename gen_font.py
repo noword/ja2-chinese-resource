@@ -82,14 +82,22 @@ if __name__ == '__main__':
         sti = Sti()
         font = ImageFont.FreeTypeFont(ttf, size=size + ADJUST)
         for t in texts:
-            img = cache.get(ttf, size, t)
-            if img is None:
+            if 'BOLD' in name:
                 left, top, right, bottom = font.getbbox(t)
-                draw.rectangle((0, 0, right, bottom), fill=0)
+                draw.rectangle((0, 0, right + 1, bottom), fill=0)
                 draw.text((0, 0), t, font=font, fill=255)
-                img = image.crop((0, 0, right, bottom))
+                draw.text((1, 0), t, font=font, fill=255)
+                img = image.crop((0, 0, right + 1, bottom))
                 img = img.point(lambda x: 0 if x < 10 else x)
-                cache.set(ttf, size, t, img)
+            else:
+                img = cache.get(ttf, size, t)
+                if img is None:
+                    left, top, right, bottom = font.getbbox(t)
+                    draw.rectangle((0, 0, right, bottom), fill=0)
+                    draw.text((0, 0), t, font=font, fill=255)
+                    img = image.crop((0, 0, right, bottom))
+                    img = img.point(lambda x: 0 if x < 10 else x)
+                    cache.set(ttf, size, t, img)
             sti.append({'image': img})
         # sti.save(open(name, 'wb'))
         slf.append_file(name, sti.getvalue())
