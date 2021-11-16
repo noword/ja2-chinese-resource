@@ -44,7 +44,7 @@ if __name__ == '__main__':
                     if ff in trans:
                         f[i] = trans[ff]['Chinese']
                     else:
-                        print(f'missing translation: {ff}')
+                        print(f'missing translation: "{ff}"')
 
         new_name = str(name).replace('eng', OUT_PATH, 1)
         try:
