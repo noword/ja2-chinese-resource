@@ -4,6 +4,7 @@ from ja2 import EdtFactory
 from translation import Translation
 from pathlib import Path
 import os
+import sys
 
 
 def load_text(name, encoding='utf-8'):
@@ -17,16 +18,18 @@ def load_text(name, encoding='utf-8'):
 
 OUT_PATH = 'out/Data'
 if __name__ == '__main__':
+    sys.stdout.reconfigure(encoding='utf-8')
     tanslation = Translation('ja2.xlsx')
     for t in tanslation.check_variables(r'\[[A-Z]+?\](?=\s|$)', 'English', 'Chinese'):
-        print(t)
+        print('\n'.join([str(x) for x in t]), '\n')
     for t in tanslation.check_variables(r'\$[A-Z]+?\$', 'English', 'Chinese'):
-        print(t)
+        print('\n'.join([str(x) for x in t]), '\n')
 
     trans = tanslation.get_translation(index='English')
     texts = set()
     for t in trans.values():
         texts |= set(t['Chinese'])
+
     font_texts = load_text('ENGLISH.txt') + load_text('OTHERS.txt') + load_text('GB2312_Level1.txt')
     for t in texts:
         if t not in font_texts:
