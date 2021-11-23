@@ -128,10 +128,10 @@ class Sti(Base, list):
         (self.ubDepth, self.uiAppDataSize, dummy) = unpack('<BI15s', io.read(0x14))
         assert dummy == b'\x00' * 15
 
-        palette_colors = [unpack('BBB', io.read(3)) for _ in range(256)]
-        colors_in_right_order = [x[0] for x in palette_colors] + [x[1] for x in palette_colors] + [x[2] for x in palette_colors]
-
-        self.palette = ImagePalette.ImagePalette('RGB', colors_in_right_order)
+        # palette_colors = [unpack('BBB', io.read(3)) for _ in range(256)]
+        # colors_in_right_order = [x[0] for x in palette_colors] + [x[1] for x in palette_colors] + [x[2] for x in palette_colors]
+        colors_in_right_order = io.read(256 * 3)
+        self.palette = ImagePalette.ImagePalette('RGB', colors_in_right_order, 256 * 3)
 
         for _ in range(num):
             self.append(dict(zip(('offset', 'size', 'x', 'y', 'h', 'w'), unpack('<2I4H', io.read(0x10)))))
@@ -140,8 +140,6 @@ class Sti(Base, list):
         for f in self:
             io.seek(data_offset + f['offset'], os.SEEK_SET)
             buf = etrle_decompress(io.read(f['size']))
-            open('1.bin', 'wb').write(buf)
-            raise
             assert len(buf) == f['w'] * f['h']
             f['image'] = Image.frombytes('P', (f['w'], f['h']), buf, 'raw')
             f['image'].putpalette(self.palette)
