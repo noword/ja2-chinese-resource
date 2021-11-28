@@ -52,16 +52,6 @@ def load_text(name, encoding='utf-8'):
     return text
 
 
-class FontCache(dict):
-    def get(self, ttf, size, char):
-        key = ttf + str(size) + char
-        return super().get(key)
-
-    def set(self, ttf, size, char, image):
-        key = ttf + str(size) + char
-        self[key] = image
-
-
 def gen_m_table(texts, name='m_table.cc'):
     with open(name, 'w', encoding='utf-8') as fp:
         for i, t in enumerate(texts):
@@ -72,15 +62,19 @@ def gen_m_table(texts, name='m_table.cc'):
 
 
 ADJUST = 1
-
+OUT_PATH = 'out/Data/Fonts'
 if __name__ == '__main__':
     texts = load_text('ENGLISH.txt') + load_text('GB2312_Level1.txt') + load_text('OTHERS.txt')
     assert len(texts) == len(set(texts))
     gen_m_table(texts)
     image = Image.new('P', (128, 128))
     draw = ImageDraw.Draw(image)
-    slf = Slf(name='FONTS.SLF', path='fonts\\')
-    # cache = FontCache()
+
+    try:
+        os.makedirs(OUT_PATH)
+    except BaseException:
+        pass
+
     for name, ttf, size, bold, palette, color0, color1 in JOBS:
         print(name, ttf, size)
         image.putpalette(ImagePalette.ImagePalette('RGB', palette, 256 * 3))
@@ -102,10 +96,4 @@ if __name__ == '__main__':
                 draw.text((0, 0), t, font=font, fill=color0)
                 img = image.crop((0, 0, right + 1, bottom + 1))
             sti.append({'image': img})
-        sti.save(open(name, 'wb'))
-        slf.append_file(name, sti.getvalue())
-    try:
-        os.makedirs('out/Data')
-    except BaseException:
-        pass
-    slf.save(open('out/Data/Fonts.slf', 'wb'))
+        sti.save(open(os.path.join(OUT_PATH, name), 'wb'))
