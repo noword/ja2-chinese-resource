@@ -128,10 +128,8 @@ class Sti(Base, list):
         (self.ubDepth, self.uiAppDataSize, dummy) = unpack('<BI15s', io.read(0x14))
         assert dummy == b'\x00' * 15
 
-        # palette_colors = [unpack('BBB', io.read(3)) for _ in range(256)]
-        # colors_in_right_order = [x[0] for x in palette_colors] + [x[1] for x in palette_colors] + [x[2] for x in palette_colors]
-        colors_in_right_order = io.read(256 * 3)
-        self.palette = ImagePalette.ImagePalette('RGB', colors_in_right_order, 256 * 3)
+        colors = io.read(256 * 3)
+        self.palette = ImagePalette.ImagePalette('RGB', colors, 256 * 3)
 
         for _ in range(num):
             self.append(dict(zip(('offset', 'size', 'x', 'y', 'h', 'w'), unpack('<2I4H', io.read(0x10)))))
@@ -143,7 +141,6 @@ class Sti(Base, list):
             assert len(buf) == f['w'] * f['h']
             f['image'] = Image.frombytes('P', (f['w'], f['h']), buf, 'raw')
             f['image'].putpalette(self.palette)
-            # f['image'] = f['image'].convert('RGB')
 
     def save(self, io):
         io.write(self.STCI_ID_STRING)
@@ -194,9 +191,3 @@ class Sti(Base, list):
             s.append(f"{i:3d} {f['offset']:08x} {f['size']:08x} {f['x']}, {f['y']}, {f['w']}, {f['h']}")
 
         return '\n'.join(s)
-
-
-if __name__ == '__main__':
-    import sys
-    sti = Sti(open(sys.argv[1], 'rb'))
-    sti.save(open('1.sti', 'wb'))

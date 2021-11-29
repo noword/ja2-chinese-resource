@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+# coding=utf-8
 from PIL import Image, ImageFont, ImageDraw, ImagePalette
 from ja2 import Slf
 from ja2 import Sti
@@ -95,5 +97,9 @@ if __name__ == '__main__':
                 draw.text((1, 1), t, font=font, fill=color1)
                 draw.text((0, 0), t, font=font, fill=color0)
                 img = image.crop((0, 0, right + 1, bottom + 1))
+            if t == 'A':
+                w, h = img.size
+                img = img.crop((0, 1, w, h - 1))
+                print(size, img.size[1])
             sti.append({'image': img})
         sti.save(open(os.path.join(OUT_PATH, name), 'wb'))
