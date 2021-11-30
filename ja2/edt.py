@@ -111,6 +111,7 @@ EDT_NAME_SIZE = {
     'MERCBIOS': [400, 160],
     'QUESTS': [80],
     'RIS': [400],
+    'CCREDITS': [80, ]
 }
 
 EDT_PATTERN_SIZE = {
