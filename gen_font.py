@@ -54,13 +54,41 @@ def load_text(name, encoding='utf-8'):
     return text
 
 
-def gen_m_table(texts, name='m_table.cc'):
+def gen_m_table_old(texts, name='m_table.cc'):
     with open(name, 'w', encoding='utf-8') as fp:
         for i, t in enumerate(texts):
             if ord(t) < 0x7f:
                 fp.write(f"\t\tm_table[L'{t}'] = {i};\n")
             else:
                 fp.write(f"\t\tm_table[{ord(t)}] = {i}; // {t}\n")
+
+
+def gen_m_table(texts, name='m_table.cc'):
+    comments = []
+    contexts = []
+    comment = ''
+    context = ''
+    for i in range(0x10000):
+        comment += ' ' * (len(context) - len(comment))
+        if chr(i) in texts:
+            comment += f"{chr(i)}"
+            context += f'0x{texts.index(chr(i)):x}, '
+        else:
+            context += '0, '
+        if (i + 1) % 0x10 == 0:
+            comments.append('//' + ' ' * 8 + comment)
+            contexts.append(context)
+            comment = ''
+            context = ''
+    if len(comment) > 0:
+        comments.append('//' + ' ' * 8 + comment)
+        contexts.append(context)
+
+    with open(name, 'w', encoding='utf-8') as fp:
+        for i, c in enumerate(comments):
+            if (len(c.strip()) > 2):
+                fp.write(c + '\n')
+            fp.write(f'/*{i*0x10:04x}*/ {contexts[i]}\n')
 
 
 ADJUST = 1
